@@ -1,0 +1,15 @@
+﻿  test.cpp
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(69,39): warning C4244: '인수': 'int'에서 'T'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(69,39): warning C4244:         with
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(69,39): warning C4244:         [
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(69,39): warning C4244:             T=float
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(69,39): warning C4244:         ]
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(73,29): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(99,46): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(105,41): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(129,50): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(140,45): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(148,45): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(155,46): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\wlsgu\source\repos\SFMLsfml\SFMLsfml\test.cpp(182,40): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  SFMLsfml.vcxproj -> C:\Users\wlsgu\source\repos\SFMLsfml\x64\Debug\SFMLsfml.exe
