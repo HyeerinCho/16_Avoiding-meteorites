@@ -1,0 +1,92 @@
+class MyCircle {
+public:
+	double velocity = 0.1;
+	double distance;
+	double radius;
+	double posX, posY;
+
+	CircleShape circle;
+
+	MyCircle(double r, double X) {
+		int nY = 800;
+		double diameter = r * 2;
+
+		radius = r;
+		posX = X;
+		posY = nY - diameter;
+
+		circle.setRadius(radius);
+		circle.setPosition(posX, posY);
+		circle.setFillColor(Color(255, 0, 0));
+		circle.setPointCount(50);
+	}
+
+	void move_left() {
+		if (posX - velocity >= 0) {
+			posX -= velocity;
+			circle.setPosition(posX, posY);
+		}
+	}
+
+	void move_right() {
+		if (posX + velocity <= 600 - 2 * radius) {
+			posX += velocity;
+			circle.setPosition(posX, posY);
+		}
+	}
+
+};
+
+int main(){
+	int nX = 600;
+	int nY = 900;
+
+	MyCircle c1(30, 10);
+
+	RenderWindow window(VideoMode(nX, nY), "Moving Ball");
+
+
+	Text text;
+	Font font;
+
+
+	if (!font.loadFromFile("E:\\arial.ttf")) { //E:\\works\\practice\\ch7\\x64\\Debug
+		return 42; // Robust error handling!
+	}
+
+
+	text.setFont(font);
+	text.setCharacterSize(20);
+	text.setFillColor(Color::Blue);
+	text.setPosition(0, 0);
+
+	while (window.isOpen())	{
+		Event e;
+
+		while (window.pollEvent(e)) {
+			if (e.type == Event::Closed)
+				window.close();
+		}
+
+		string t = "";
+		text.setString(t);
+
+		if (Keyboard::isKeyPressed(Keyboard::Left)) {
+			c1.move_left();
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+			c1.move_right();
+		}
+
+		window.clear();
+
+		window.draw(c1.circle);
+		window.draw(text);
+
+		window.display();
+
+	}
+
+	return 0;
+
+}
