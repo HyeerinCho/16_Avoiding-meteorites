@@ -1,94 +1,112 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <ctime>
+#include <cstdlib>
 using namespace sf;
 using namespace std;
-int main()
-{
+int main(){
     RenderWindow window(VideoMode(600, 900), "Avoid the Meteorites!");
-    Font font;
+    srand((unsigned int)time(NULL));
 
+    // Fonts
+    Font font;
     if (!font.loadFromFile("C:\\Users\\wlsgu\\OneDrive\\바탕 화면\\컴프실\\KdamThmorPro-Regular.ttf"))
     {
         cerr << "폰트 파일 못 읽음" << endl;
         return -1;
     }
 
-    // 배경 이미지 로드
-    Texture backgroundTexture;
-    if (!backgroundTexture.loadFromFile("C:\\Users\\wlsgu\\OneDrive\\background_image.jpg")) {
-        cerr << "배경 이미지 못 읽음" << endl;
-        return -1;
-    }
+    // Texts
+    Text gameOverText, pressRtoRestart, scoreNUM, scoreTEXT;
+    scoreNUM.setFont(font);
+    scoreNUM.setCharacterSize(40);
+    scoreNUM.setFillColor(Color::White);
+    scoreNUM.setPosition(275, 150);
 
-    // 배경 생성
-    Sprite backgroundSprite(backgroundTexture);
+    scoreTEXT.setFont(font);
+    scoreTEXT.setCharacterSize(60);
+    scoreTEXT.setString("SCORE");
+    scoreTEXT.setFillColor(Color::White);
+    scoreTEXT.setPosition(207, 70);
 
-
-    Text gameOverText; //GAME OVER! 텍스트 설정
     gameOverText.setFont(font);
     gameOverText.setCharacterSize(50);
     gameOverText.setString("GAME OVER!");
     gameOverText.setFillColor(Color::White);
-    gameOverText.setPosition(150, 200);
+    gameOverText.setPosition(150, 320);
 
-    Text pressRtoRestart; //Press R to Restart 텍스트 설정
     pressRtoRestart.setFont(font);
     pressRtoRestart.setCharacterSize(20);
     pressRtoRestart.setString("Press R to Restart");
     pressRtoRestart.setFillColor(Color::White);
-    pressRtoRestart.setPosition(220, 260);
+    pressRtoRestart.setPosition(220, 380);
 
-    Text scoreNUM; //점수 텍스트 설정
-    scoreNUM.setFont(font);
-    scoreNUM.setCharacterSize(40);
-    scoreNUM.setFillColor(Color::White);
-    scoreNUM.setPosition(280, 150);
+    // Background
+    Texture backgroundTexture;
+    if (!backgroundTexture.loadFromFile("C:\\Users\\wlsgu\\OneDrive\\background_image.jpg"))
+    {
+        cerr << "배경 이미지 못 읽음" << endl;
+        return -1;
+    }
+    Sprite backgroundSprite(backgroundTexture);
 
-    Text scoreTEXT; //score 텍스트 설정
-    scoreTEXT.setFont(font);
-    scoreTEXT.setCharacterSize(40);
-    scoreTEXT.setFillColor(Color::White);
-    scoreTEXT.setPosition(280, 150);
+    // Player
+    RectangleShape player(Vector2f(50, 50));
+    player.setFillColor(Color::Green);
+    player.setPosition(275, 800);
+    float playerSpeed = 0.1f;
 
-
-    int score = 0;
-    int remainingLives = 3; // 초기 목숨 개수
-
+    // Lives
     Texture heartTexture;
-    if (!heartTexture.loadFromFile("C:\\Users\\wlsgu\\OneDrive\\heart_image.jpg"))
+    if (!heartTexture.loadFromFile("C:\\Users\\wlsgu\\OneDrive\\heart_image.png"))
     {
         cerr << "목숨 이미지 파일 못 읽음" << endl;
         return -1;
     }
 
-    
-
     Sprite heartSprite;
     heartSprite.setTexture(heartTexture);
     heartSprite.setScale(0.1f, 0.1f);
+    int lives = 3;
 
-    RectangleShape player(Vector2f(50, 50)); //플레이어 설정
-    player.setFillColor(Color::Green);
-    player.setPosition(275, 800);
-
-    CircleShape meteorite(25); //운석 설정
+    // Meteorite
+    CircleShape meteorite(25);
     meteorite.setFillColor(Color::Red);
     Vector2f meteoritePosition(rand() % 525, 0);
-
-    RectangleShape life(Vector2f(30, 30)); // 목숨 설정
-    life.setFillColor(Color::Blue);
-    life.setPosition(rand() % 525, -30); // 화면 상단 밖에서 시작
-
-    float playerSpeed = 0.1f;
     float meteoriteSpeed = 0.2f;
+
+    // Buff
+    Texture buffIcon;
+    if (!buffIcon.loadFromFile("C:\\Users\\wlsgu\\OneDrive\\buffIcon_image.png"))
+    {
+        cerr << "버프 이미지 파일 못 읽음" << endl;
+        return -1;
+    }
+    Sprite buff;
+    buff.setTexture(buffIcon);
+    buff.setScale(0.3f, 0.3f);
+    float buffSpeed = 0.1f;
+    Clock buffClock; //buff가 20초마다 등장할 수 있도록 buffinterver과 비교하기위한 개체
+    float buffinterval = 20.0f;
+    bool buffDropped = false;
+
+
+    // Life
+    Sprite life;
+    life.setTexture(heartTexture);
+    life.setScale(0.1f, 0.1f);
     float lifeSpeed = 0.1f;
+    Clock lifeClock; //life가 15초마다 등장할 수 있도록 lifeInterver과 비교하기위한 개체
+    float lifeInterval = 15.0f;
+    bool lifeDropped = false;
 
-    bool gamePaused = false; //운석과 유저가 부딪히면 true가 됨
-    int consecutiveDodges = 0; // 연속으로 피한 횟수
+    RectangleShape bullet(Vector2f(0.1f, 0.3f));
+    bullet.setFillColor(Color::Yellow);
 
-    Clock lifeClock; // 목숨이 떨어지는 주기를 측정하기 위한 Clock 객체
-    float lifeInterval = 3.0f; // 목숨이 떨어지는 주기 (초)
-    bool lifeDropped = false; // 목숨이 떨어진 상태인지 여부
+    // Game State
+    bool gamePaused = false;
+    int consecutiveDodges = 0; //연속으로 피한 운석 갯수를 담는 변수
+    int score = 0;
 
     while (window.isOpen())
     {
@@ -96,110 +114,148 @@ int main()
         while (window.pollEvent(event))
         {
             if (event.type == Event::Closed)
-            {
                 window.close();
-            }
 
-            if (gamePaused && event.type == Event::KeyPressed && event.key.code == Keyboard::R) //R키를 눌러 게임 재시작하기
+            if (gamePaused && event.type == Event::KeyPressed && event.key.code == Keyboard::R)
             {
+                // Restart the game
                 player.setPosition(275, 800);
                 meteorite.setPosition(rand() % 525, 0);
                 gamePaused = false;
-                score = 0; // 게임 재시작시 스코어 초기화
-                remainingLives = 3; // 게임 재시작시 목숨 초기화
-                consecutiveDodges = 0; // 연속으로 피한 횟수 초기화
-                lifeClock.restart(); // 목숨 떨어지는 주기를 초기화
-                life.setPosition(rand() % 525, -30); // 화면 상단 밖에서 시작
-                lifeDropped = false; // 목숨 떨어진 상태 초기화
+                score = 0;
+                lives = 3;
+                consecutiveDodges = 0;
+                lifeClock.restart();
+                buffClock.restart();
+                life.setPosition(rand() % 525, -30);
+                buff.setPosition(rand() % 525, -30);
+                lifeDropped = false;
+                buffDropped = false;
             }
         }
 
         if (!gamePaused)
         {
+            // Player Movement
             if (Keyboard::isKeyPressed(Keyboard::Left) && player.getPosition().x > 0)
                 player.move(-playerSpeed, 0);
+
             if (Keyboard::isKeyPressed(Keyboard::Right) && player.getPosition().x < 550)
                 player.move(playerSpeed, 0);
 
+            // Meteorite Movement
             meteorite.move(0, meteoriteSpeed);
 
+            // Player and Meteorite Collision
             if (player.getGlobalBounds().intersects(meteorite.getGlobalBounds()))
             {
-                remainingLives--;
+                lives--;
 
-                if (remainingLives <= 0)
-                {
+                if (lives <= 0)
                     gamePaused = true;
-                }
                 else
                 {
                     meteorite.setPosition(rand() % 525, 0);
-                    consecutiveDodges = 0; // 피하다가 부딪히면 연속으로 피한 횟수 초기화
+                    consecutiveDodges = 0;
                 }
             }
 
+            // Meteorite Reset
+            if (meteorite.getPosition().y > 1000)
+            {
+                meteorite.setPosition(rand() % 525, 0);
+                score += 3;
+                consecutiveDodges++;
+
+                if (consecutiveDodges == 5) //5개를 연속으로 피했을 시 + 5점
+                {
+                    score += 2; //기본 점수 +3과 추가 점수 +2
+                    consecutiveDodges = 0;
+                }
+            }
+
+            // Life Movement and Collision
             if (!lifeDropped)
             {
                 life.move(0, lifeSpeed);
 
-                if (life.getPosition().y > 1000 || lifeClock.getElapsedTime().asSeconds() > lifeInterval)
+                if (lifeClock.getElapsedTime().asSeconds() >= lifeInterval)
                 {
                     life.setPosition(rand() % 525, -30);
+
                     lifeClock.restart();
-                    lifeDropped = true; // 목숨이 떨어진 상태로 설정
+                    lifeDropped = false;
                 }
 
                 if (player.getGlobalBounds().intersects(life.getGlobalBounds()))
                 {
-                    remainingLives++;
-                    life.setPosition(rand() % 525, -30);
-                    lifeDropped = true; // 목숨이 떨어진 상태로 설정
+                    lives++;
+                    life.setPosition(-300, -300);
+                    lifeDropped = false;
                 }
             }
 
-            if (meteorite.getPosition().y > 1000)
+            // Buff Movement and Collision
+            if (!buffDropped)
             {
-                meteorite.setPosition(rand() % 525, 0);
-                score++; // 운석을 피할 때마다 스코어 증가
-                consecutiveDodges++;
-
-                if (consecutiveDodges == 5)
+                buff.move(0, buffSpeed);
+                if (buffClock.getElapsedTime().asSeconds() >= buffinterval)
                 {
-                    score += 2; // 5번 연속으로 피한 경우 3점 추가를 위해 2로 설정, 기본 운석 점수 + 추가 점수 2점
-                    consecutiveDodges = 0; // 연속으로 피한 횟수 초기화
+                    buff.setPosition(rand() % 525, -30);
+                    buffClock.restart();
+                    buffDropped = false;
                 }
-            }
+
+                if (player.getGlobalBounds().intersects(buff.getGlobalBounds()))
+                {
+                    bullet.setPosition(player.getPosition().x + player.getSize().x / 2 - bullet.getSize().x / 2,player.getPosition().y);
+                    buff.setPosition(-300, -300);
+                    buffDropped = false;
+                }
+                if (buffDropped) {
+                    if (Keyboard::isKeyPressed(Keyboard::Up) && bullet.getPosition().y > 0)
+                    {
+                        bullet.move(0, -0.3f);
+                    }
+                }
+            }       
+
         }
 
         window.clear();
 
-        //배경 & 캐릭터 & 운석 그리기
+        // Draw Background, Player, Meteorite
         window.draw(backgroundSprite);
         window.draw(player);
         window.draw(meteorite);
-
+        window.draw(scoreTEXT);
+        window.draw(bullet);
+        // Draw Life and Buff if not dropped
         if (!lifeDropped)
-        {
             window.draw(life);
-        }
 
-        //목숨 그리기
-        for (int i = 0; i < remainingLives; ++i)
+        if (!buffDropped)
+            window.draw(buff);
+
+        // Draw Lives
+        for (int i = 0; i < lives; ++i)
         {
             heartSprite.setPosition(10 + i * 40, 10);
             window.draw(heartSprite);
         }
 
-        //점수 출력
+        // Draw Score
         scoreNUM.setString(to_string(score));
         window.draw(scoreNUM);
+        window.draw(scoreTEXT);
 
+        // Draw Game Over and Restart Text
         if (gamePaused)
         {
             window.draw(gameOverText);
             window.draw(pressRtoRestart);
         }
-
+      
         window.display();
     }
 
